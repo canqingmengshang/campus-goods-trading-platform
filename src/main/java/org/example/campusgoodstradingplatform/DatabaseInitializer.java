@@ -139,7 +139,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                 (3,'考研英语真题套装','图书',128,56,'12册','/images/product-book.svg','资料完整无缺页，可在教学楼自取。',0,12,61,'七成新','PUBLISHED',96.80),
                 (3,'宿舍小冰箱','电器',699,420,'48L','/images/product-fridge.svg','通电正常，支持现场验货。',1,2,17,'九成新','PUBLISHED',94.20),
                 (3,'机械键盘青轴','数码',299,169,'87键','/images/product-keyboard.svg','按键正常，附数据线。',0,8,43,'九成新','PUBLISHED',97.60),
-                (4,'摄影补光灯套装','数码',260,118,'双灯','/images/product-light.svg','适合社团拍摄和直播。',1,5,0,'九成新','AUDITING',100.00)
+                (4,'摄影补光灯套装','数码',260,118,'双灯','/images/product-light.svg','适合社团拍摄和直播。',1,5,0,'九成新','PUBLISHED',100.00)
                 """);
     }
 
