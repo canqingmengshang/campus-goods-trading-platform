@@ -37,7 +37,7 @@ public class MarketplaceController {
         this.fileStorage = fileStorage;
     }
 
-    @GetMapping({"/", "/login", "/home", "/product/{id}", "/cart", "/user", "/shop/{id}", "/merchant/products",
+    @GetMapping({"/", "/login", "/home", "/product/{id}", "/cart", "/orders", "/user", "/shop/{id}", "/merchant/products",
             "/merchant/publish", "/admin/audit", "/admin/users"})
     public String index() {
         return "forward:/index.html";

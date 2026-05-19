@@ -287,6 +287,20 @@ const Cart = {
             return Math.max(0, this.total - this.pointsUsed / 100);
         }
     },
+    watch: {
+        pointsUsed(value) {
+            const points = Number(value || 0);
+            const maxPoints = Number(this.user.points || 0);
+            if (points < 0) {
+                this.pointsUsed = 0;
+                return;
+            }
+            if (points > maxPoints) {
+                this.pointsUsed = maxPoints;
+                this.msg = '积分不足，已自动调整为当前可用积分 ' + maxPoints;
+            }
+        }
+    },
     async mounted() {
         await this.load();
     },
@@ -301,10 +315,24 @@ const Cart = {
             this.items = await api.put('/api/users/' + session.current.id + '/cart', this.items);
         },
         async checkout() {
+            if (this.pointsUsed > Number(this.user.points || 0)) {
+                this.pointsUsed = Number(this.user.points || 0);
+                this.msg = '积分不足，已自动调整为当前可用积分 ' + this.pointsUsed;
+                return;
+            }
+            if (this.payable > Number(this.user.wallet || 0)) {
+                this.msg = '钱包余额不足，当前余额 ¥' + this.money(this.user.wallet) + '，应付 ¥' + this.money(this.payable);
+                return;
+            }
             await this.save();
-            const order = await api.post('/api/users/' + session.current.id + '/checkout?pointsUsed=' + this.pointsUsed);
-            this.msg = '下单成功，订单号 ' + order.id;
-            await this.load();
+            try {
+                const order = await api.post('/api/users/' + session.current.id + '/checkout?pointsUsed=' + this.pointsUsed);
+                this.msg = '下单成功，订单号 ' + order.id;
+                await this.load();
+            } catch (error) {
+                this.msg = error.message;
+                await this.load();
+            }
         }
     },
     template: `
@@ -323,7 +351,7 @@ const Cart = {
 
 const UserCenter = {
     data() {
-        return {user: {}, orders: [], products: {}, review: {stars: 5, content: ''}, msg: ''};
+        return {user: {}};
     },
     async mounted() {
         await this.load();
@@ -332,6 +360,42 @@ const UserCenter = {
         money,
         async load() {
             this.user = await api.get('/api/users/' + session.current.id);
+        }
+    },
+    template: `
+    <main class="container">
+      <section class="split">
+        <div class="panel">
+          <h2>个人中心</h2>
+          <p>用户：{{user.username}}</p>
+          <p>姓名：{{user.realName || '-'}}</p>
+          <p>手机号：{{user.phone || '-'}}</p>
+          <p>邮箱：{{user.email || '-'}}</p>
+          <p>城市：{{user.city || '-'}}</p>
+          <p>性别：{{user.gender || '-'}}</p>
+          <p>角色：{{user.role}}</p>
+          <p>状态：{{user.status}}</p>
+        </div>
+        <div class="panel">
+          <h2>钱包</h2>
+          <p class="price">¥{{money(user.wallet)}}</p>
+          <p>积分总数：{{user.points}}</p>
+          <p>银行账号：{{user.bankAccount || '-'}}</p>
+        </div>
+      </section>
+    </main>`
+};
+
+const OrderDetail = {
+    data() {
+        return {orders: [], products: {}, review: {stars: 5, content: ''}, msg: ''};
+    },
+    async mounted() {
+        await this.load();
+    },
+    methods: {
+        money,
+        async load() {
             this.orders = await api.get('/api/users/' + session.current.id + '/orders');
             for (const order of this.orders) for (const item of order.items) this.products[item.productId] = await api.get('/api/products/' + item.productId);
         },
@@ -351,8 +415,7 @@ const UserCenter = {
     },
     template: `
     <main class="container">
-      <section class="split"><div class="panel"><h2>个人中心</h2><p>用户：{{user.username}}</p><p>角色：{{user.role}}</p><p>状态：{{user.status}}</p></div><div class="panel"><h2>钱包</h2><p class="price">¥{{money(user.wallet)}}</p><p>积分总数：{{user.points}}</p></div></section>
-      <section class="panel" style="margin-top:16px"><h2>购买历史</h2>
+      <section class="panel"><h2>订单详情</h2>
         <div v-for="order in orders" :key="order.id" class="panel" style="margin:12px 0">
           <div class="title-row"><b>订单 {{order.id}}</b><span class="badge">{{order.status}}</span></div>
           <p>实付 ¥{{money(order.totalAmount)}}，积分抵扣 {{order.pointsUsed}}</p>
@@ -614,6 +677,7 @@ const routes = [
     [/^\/$|^\/home$/, Home],
     [/^\/product\/\d+$/, ProductDetail],
     [/^\/cart$/, Cart],
+    [/^\/orders$/, OrderDetail],
     [/^\/user$/, UserCenter],
     [/^\/shop\/\d+$/, Shop],
     [/^\/merchant\/products$/, MerchantProducts],
@@ -666,6 +730,7 @@ createApp({
         <nav class="nav">
           <a :class="{active:path==='/home'}" @click.prevent="nav('/home')" href="/home">首页</a>
           <a :class="{active:path==='/cart'}" @click.prevent="nav('/cart')" href="/cart">购物车</a>
+          <a :class="{active:path==='/orders'}" @click.prevent="nav('/orders')" href="/orders">订单详情</a>
           <a :class="{active:path==='/user'}" @click.prevent="nav('/user')" href="/user">个人中心</a>
           <a v-if="canMerchant" :class="{active:path==='/merchant/products'}" @click.prevent="nav('/merchant/products')" href="/merchant/products">商家工作台</a>
           <a v-if="canAdmin" :class="{active:path==='/admin/audit'}" @click.prevent="nav('/admin/audit')" href="/admin/audit">审核管理</a>
