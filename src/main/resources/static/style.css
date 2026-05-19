@@ -208,6 +208,61 @@ textarea {
     width: min(100%, 616px);
 }
 
+.shop-hero {
+    display: grid;
+    grid-template-columns: 1fr minmax(360px, 0.8fr);
+    gap: 20px;
+    align-items: center;
+}
+
+.shop-hero h2 {
+    margin: 0 0 8px;
+}
+
+.shop-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.shop-stats div {
+    padding: 14px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f8fbff;
+    text-align: center;
+}
+
+.shop-stats b {
+    display: block;
+    font-size: 22px;
+    color: var(--blue);
+}
+
+.shop-stats span {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.review-list {
+    display: grid;
+    gap: 10px;
+}
+
+.review-item {
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fbfdff;
+}
+
+.review-item p {
+    margin: 6px 0 0;
+    color: var(--muted);
+}
+
 .price {
     color: #dc2626;
     font-size: 22px;
@@ -360,8 +415,12 @@ textarea {
         grid-template-columns: 1fr;
     }
 
-    .toolbar, .form-grid, .search-row, .filter-row {
+    .toolbar, .form-grid, .search-row, .filter-row, .shop-hero {
         grid-template-columns: 1fr;
+    }
+
+    .shop-stats {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .topbar {
