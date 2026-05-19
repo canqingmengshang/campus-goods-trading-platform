@@ -192,6 +192,22 @@ textarea {
     margin-bottom: 18px;
 }
 
+.search-row {
+    display: grid;
+    grid-template-columns: 1fr 76px;
+    gap: 10px;
+    width: min(100%, 616px);
+    margin-bottom: 12px;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: repeat(3, 170px) 76px;
+    gap: 10px;
+    align-items: center;
+    width: min(100%, 616px);
+}
+
 .price {
     color: #dc2626;
     font-size: 22px;
@@ -276,15 +292,21 @@ textarea {
     justify-content: end;
     padding: 54px;
     color: #fff;
-    background: linear-gradient(130deg, rgba(30, 64, 175, 0.86), rgba(15, 118, 110, 0.78)),
-        url("https://dummyimage.com/1400x900/dbeafe/1e40af&text=Second-hand+Campus");
+    background: linear-gradient(130deg, #315fc2, #338f93);
     background-size: cover;
+    text-align: left;
 }
 
 .login-art h1 {
     margin: 0 0 12px;
     font-size: 48px;
     letter-spacing: 0;
+}
+
+.login-art p {
+    max-width: 760px;
+    margin: 0;
+    line-height: 1.8;
 }
 
 .login-panel {
@@ -338,7 +360,7 @@ textarea {
         grid-template-columns: 1fr;
     }
 
-    .toolbar, .form-grid {
+    .toolbar, .form-grid, .search-row, .filter-row {
         grid-template-columns: 1fr;
     }
 
