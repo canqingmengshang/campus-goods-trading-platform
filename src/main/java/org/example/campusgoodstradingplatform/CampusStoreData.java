@@ -29,7 +29,12 @@ public final class CampusStoreData {
         public long id;
         public String username;
         public String password;
+        public String realName;
         public String phone;
+        public String email;
+        public String city;
+        public String gender;
+        public String bankAccount;
         public Role role;
         public UserStatus status;
         public BigDecimal wallet;
@@ -98,7 +103,12 @@ public final class CampusStoreData {
     public record RegisterRequest(
             String username,
             String password,
+            String realName,
             String phone,
+            String email,
+            String city,
+            String gender,
+            String bankAccount,
             Role role,
             String shopName
     ) {

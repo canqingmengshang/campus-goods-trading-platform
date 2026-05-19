@@ -1,5 +1,6 @@
 package org.example.campusgoodstradingplatform;
 
+import jakarta.servlet.http.HttpSession;
 import org.example.campusgoodstradingplatform.CampusStoreData.CartItem;
 import org.example.campusgoodstradingplatform.CampusStoreData.FeeRequest;
 import org.example.campusgoodstradingplatform.CampusStoreData.LoginRequest;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Controller
 public class MarketplaceController {
@@ -43,14 +45,19 @@ public class MarketplaceController {
 
     @ResponseBody
     @GetMapping("/api/captcha")
-    public Map<String, Object> captcha() {
-        return service.captcha();
+    public Map<String, Object> captcha(HttpSession session) {
+        String code = randomCaptcha();
+        session.setAttribute("LOGIN_CAPTCHA", code);
+        return service.captcha(code);
     }
 
     @ResponseBody
     @PostMapping("/api/login")
-    public Object login(@RequestBody LoginRequest request) {
-        return service.login(request);
+    public Object login(@RequestBody LoginRequest request, HttpSession session) {
+        String expectedCaptcha = (String) session.getAttribute("LOGIN_CAPTCHA");
+        Object user = service.login(request, expectedCaptcha);
+        session.removeAttribute("LOGIN_CAPTCHA");
+        return user;
     }
 
     @ResponseBody
@@ -202,5 +209,15 @@ public class MarketplaceController {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> badRequest(IllegalArgumentException exception) {
         return ResponseEntity.badRequest().body(Map.of("message", exception.getMessage()));
+    }
+
+    private String randomCaptcha() {
+        String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        StringBuilder code = new StringBuilder(4);
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        for (int i = 0; i < 4; i++) {
+            code.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return code.toString();
     }
 }

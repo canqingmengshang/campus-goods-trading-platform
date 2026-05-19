@@ -19,7 +19,12 @@ public class DatabaseInitializer implements CommandLineRunner {
                     id BIGINT PRIMARY KEY AUTO_INCREMENT,
                     username VARCHAR(64) NOT NULL UNIQUE,
                     password VARCHAR(128) NOT NULL,
+                    real_name VARCHAR(64),
                     phone VARCHAR(32),
+                    email VARCHAR(120),
+                    city VARCHAR(64),
+                    gender VARCHAR(20),
+                    bank_account CHAR(16),
                     role VARCHAR(20) NOT NULL,
                     status VARCHAR(20) NOT NULL,
                     wallet DECIMAL(12,2) NOT NULL DEFAULT 0,
@@ -33,6 +38,12 @@ public class DatabaseInitializer implements CommandLineRunner {
                     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
                 """);
+        addColumnIfMissing("users", "real_name", "VARCHAR(64)");
+        addColumnIfMissing("users", "email", "VARCHAR(120)");
+        addColumnIfMissing("users", "city", "VARCHAR(64)");
+        addColumnIfMissing("users", "gender", "VARCHAR(20)");
+        addColumnIfMissing("users", "bank_account", "CHAR(16)");
+
         jdbc.execute("""
                 CREATE TABLE IF NOT EXISTS products (
                     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -114,12 +125,12 @@ public class DatabaseInitializer implements CommandLineRunner {
 
     private void seed() {
         jdbc.update("""
-                INSERT INTO users(id, username, password, phone, role, status, wallet, points, shop_name, merchant_level, fee_rate, favorable_rate)
+                INSERT INTO users(id, username, password, real_name, phone, email, city, gender, bank_account, role, status, wallet, points, shop_name, merchant_level, fee_rate, favorable_rate)
                 VALUES
-                (1,'admin','123456','13800000001','ADMIN','ACTIVE',1000,2000,'平台管理',5,1.00,100),
-                (2,'buyer','123456','13800000002','BUYER','ACTIVE',800,1600,'学生买家',3,0.50,100),
-                (3,'merchant','123456','13800000003','MERCHANT','ACTIVE',800,1600,'梧桐二手铺',3,0.50,97.50),
-                (4,'newshop','123456','13800000004','MERCHANT','PENDING',800,1600,'新芽数码店',3,0.50,100)
+                (1,'admin','123456','平台管理员','13800000001','admin@campus.test','杭州','男','1111222233334444','ADMIN','ACTIVE',1000,2000,'平台管理',5,1.00,100),
+                (2,'buyer','123456','学生买家','13800000002','buyer@campus.test','杭州','女','2222333344445555','BUYER','ACTIVE',800,1600,'学生买家',3,0.50,100),
+                (3,'merchant','123456','商家负责人','13800000003','merchant@campus.test','杭州','男','3333444455556666','MERCHANT','ACTIVE',800,1600,'梧桐二手铺',3,0.50,97.50),
+                (4,'newshop','123456','新店负责人','13800000004','newshop@campus.test','杭州','女','4444555566667777','MERCHANT','PENDING',800,1600,'新芽数码店',3,0.50,100)
                 """);
         jdbc.update("""
                 INSERT INTO products(merchant_id, name, category, original_price, sale_price, size, photos, usage_guide, negotiable, stock, sales, condition_text, status, favorable_rate)
@@ -130,5 +141,16 @@ public class DatabaseInitializer implements CommandLineRunner {
                 (3,'机械键盘青轴','数码',299,169,'87键','/images/product-keyboard.svg','按键正常，附数据线。',0,8,43,'九成新','PUBLISHED',97.60),
                 (4,'摄影补光灯套装','数码',260,118,'双灯','/images/product-light.svg','适合社团拍摄和直播。',1,5,0,'九成新','AUDITING',100.00)
                 """);
+    }
+
+    private void addColumnIfMissing(String tableName, String columnName, String definition) {
+        Integer count = jdbc.queryForObject("""
+                SELECT COUNT(*)
+                FROM information_schema.columns
+                WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?
+                """, Integer.class, tableName, columnName);
+        if (count != null && count == 0) {
+            jdbc.execute("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + definition);
+        }
     }
 }

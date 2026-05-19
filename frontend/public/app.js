@@ -69,7 +69,17 @@ const LoginRegister = {
             captcha: {},
             msg: '',
             loginForm: {username: 'buyer', password: '123456', captcha: ''},
-            registerForm: {username: '', password: '', phone: '', shopName: ''},
+            registerForm: {
+                username: '',
+                password: '',
+                realName: '',
+                phone: '',
+                email: '',
+                city: '',
+                gender: '',
+                bankAccount: '',
+                shopName: ''
+            },
             license: null,
             idCard: null
         };
@@ -80,7 +90,7 @@ const LoginRegister = {
     methods: {
         async loadCaptcha() {
             this.captcha = await api.get('/api/captcha');
-            this.loginForm.captcha = this.captcha.code;
+            this.loginForm.captcha = '';
         },
         async login() {
             try {
@@ -94,14 +104,22 @@ const LoginRegister = {
         },
         async register() {
             try {
+                if (!/^1\d{10}$/.test(this.registerForm.phone)) {
+                    this.msg = '手机号必须为11位数字且以1开头';
+                    return;
+                }
                 const form = new FormData();
                 Object.entries(this.registerForm).forEach(([key, value]) => form.append(key, value || ''));
                 form.append('role', this.role);
                 if (this.license) form.append('license', this.license);
                 if (this.idCard) form.append('idCard', this.idCard);
-                const user = await api.post('/api/register', form);
-                session.save(user);
-                nav('/home');
+                await api.post('/api/register', form);
+                this.msg = '注册申请已提交，请等待管理员审核。审核通过后方可登录使用。';
+                this.mode = 'login';
+                this.registerForm = {username: '', password: '', realName: '', phone: '', email: '', city: '', gender: '', bankAccount: '', shopName: ''};
+                this.license = null;
+                this.idCard = null;
+                await this.loadCaptcha();
             } catch (error) {
                 this.msg = error.message;
             }
@@ -126,7 +144,6 @@ const LoginRegister = {
             <div class="captcha"><input v-model="loginForm.captcha"><img :src="captcha.image" @click="loadCaptcha"></div>
           </label>
           <button class="full" @click="login">登录系统</button>
-          <p class="full muted">演示账号：buyer / merchant / admin，密码均为 123456。</p>
         </div>
         <div v-else class="form-grid">
           <label class="full">注册类型
@@ -134,10 +151,17 @@ const LoginRegister = {
           </label>
           <label>用户名<input v-model="registerForm.username"></label>
           <label>密码<input v-model="registerForm.password" type="password"></label>
-          <label>手机号<input v-model="registerForm.phone"></label>
+          <label>姓名<input v-model="registerForm.realName"></label>
+          <label>手机号<input v-model="registerForm.phone" maxlength="11" placeholder="11位手机号"></label>
+          <label v-if="role==='BUYER'">邮箱<input v-model="registerForm.email" type="email"></label>
+          <label v-if="role==='BUYER'">城市<input v-model="registerForm.city"></label>
+          <label>性别
+            <select v-model="registerForm.gender"><option value="">请选择</option><option>男</option><option>女</option><option>其他</option></select>
+          </label>
+          <label>银行账号<input v-model="registerForm.bankAccount" maxlength="16" placeholder="16位数字"></label>
           <label v-if="role==='MERCHANT'">店铺名<input v-model="registerForm.shopName"></label>
           <label v-if="role==='MERCHANT'">营业执照<input type="file" @change="license=$event.target.files[0]"></label>
-          <label v-if="role==='MERCHANT'">身份证明<input type="file" @change="idCard=$event.target.files[0]"></label>
+          <label v-if="role==='MERCHANT'">身份证<input type="file" @change="idCard=$event.target.files[0]"></label>
           <button class="full" @click="register">提交注册</button>
         </div>
       </section>
@@ -186,13 +210,16 @@ const Home = {
         </div>
       </section>
       <section class="panel">
-        <div class="toolbar">
+        <div class="search-row">
           <input v-model="filters.keyword" placeholder="按商品名称搜索">
+          <button @click="load">搜索</button>
+        </div>
+        <div class="filter-row">
           <select v-model="filters.sort"><option value="">默认排序</option><option value="price">价格</option><option value="sales">销量</option><option value="rate">好评率</option></select>
           <input v-model="filters.minPrice" placeholder="最低价">
           <input v-model="filters.maxPrice" placeholder="最高价">
+          <button @click="load">筛选</button>
         </div>
-        <div class="actions"><button @click="load">筛选商品</button></div>
       </section>
       <section class="grid" style="margin-top:16px">
         <article v-for="p in products" :key="p.id" class="card">
@@ -433,7 +460,16 @@ const AdminAudit = {
     },
     template: `
     <main class="container"><section class="split">
-      <div class="panel"><h2>待审核用户 / 商家</h2><table class="table"><tr v-for="u in merchants" :key="u.id"><td>{{u.shopName}}</td><td><img v-if="u.licenseImage" :src="u.licenseImage" style="width:90px"></td><td><img v-if="u.idCardImage" :src="u.idCardImage" style="width:90px"></td><td><button @click="approveUser(u.id)">批准生效</button></td></tr></table></div>
+      <div class="panel"><h2>待审核用户 / 商家</h2><table class="table">
+        <thead><tr><th>账号</th><th>身份信息</th><th>银行账号</th><th>证件图片</th><th>操作</th></tr></thead>
+        <tbody><tr v-for="u in merchants" :key="u.id">
+          <td>{{u.username}}<br><span class="badge">{{u.role}}</span></td>
+          <td>{{u.realName}} · {{u.gender}}<br><span class="muted">{{u.phone}} {{u.email}} {{u.city}}</span><br><span v-if="u.role==='MERCHANT'">{{u.shopName}}</span></td>
+          <td>{{u.bankAccount}}</td>
+          <td><img v-if="u.licenseImage" :src="u.licenseImage" style="width:72px"> <img v-if="u.idCardImage" :src="u.idCardImage" style="width:72px"></td>
+          <td><button @click="approveUser(u.id)">批准生效</button></td>
+        </tr></tbody>
+      </table></div>
       <div class="panel"><h2>待审核商品</h2><table class="table"><tr v-for="p in products" :key="p.id"><td>{{p.name}}</td><td>{{p.merchantName}}</td><td><button @click="approveProduct(p.id)">批准上架</button></td></tr></table></div>
     </section></main>`
 };

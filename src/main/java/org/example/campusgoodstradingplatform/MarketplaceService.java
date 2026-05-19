@@ -29,9 +29,11 @@ import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,7 +42,6 @@ import java.util.Objects;
 @Service
 public class MarketplaceService {
     private final JdbcTemplate jdbc;
-    private String captcha = "7G5K";
 
     public MarketplaceService(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
@@ -51,7 +52,12 @@ public class MarketplaceService {
         user.id = rs.getLong("id");
         user.username = rs.getString("username");
         user.password = rs.getString("password");
+        user.realName = rs.getString("real_name");
         user.phone = rs.getString("phone");
+        user.email = rs.getString("email");
+        user.city = rs.getString("city");
+        user.gender = rs.getString("gender");
+        user.bankAccount = rs.getString("bank_account");
         user.role = Role.valueOf(rs.getString("role"));
         user.status = UserStatus.valueOf(rs.getString("status"));
         user.wallet = rs.getBigDecimal("wallet");
@@ -88,48 +94,64 @@ public class MarketplaceService {
         return product;
     };
 
-    public Map<String, Object> captcha() {
-        captcha = "C" + (int) (Math.random() * 9) + "P" + (int) (Math.random() * 9);
+    public Map<String, Object> captcha(String code) {
         String svg = "<svg xmlns='http://www.w3.org/2000/svg' width='128' height='44'>"
                 + "<rect width='128' height='44' rx='8' fill='#eef6ff'/>"
                 + "<path d='M8 34 C28 4, 52 54, 76 15 S110 12,120 32' stroke='#36a3ff' fill='none' stroke-width='3'/>"
                 + "<text x='22' y='30' font-size='24' font-family='Arial' font-weight='700' fill='#22324d'>"
-                + captcha + "</text></svg>";
-        return Map.of("code", captcha, "image", "data:image/svg+xml;utf8," + svg);
+                + code + "</text></svg>";
+        String image = "data:image/svg+xml;base64,"
+                + Base64.getEncoder().encodeToString(svg.getBytes(StandardCharsets.UTF_8));
+        return Map.of("image", image);
     }
 
-    public User login(LoginRequest request) {
-        if (request.captcha() != null && !request.captcha().equalsIgnoreCase(captcha)) {
+    public User login(LoginRequest request, String expectedCaptcha) {
+        if (expectedCaptcha == null || request.captcha() == null
+                || request.captcha().isBlank()
+                || !request.captcha().trim().equalsIgnoreCase(expectedCaptcha)) {
             throw new IllegalArgumentException("图形验证码错误");
         }
         try {
-            return jdbc.queryForObject("SELECT * FROM users WHERE username=? AND password=?", userMapper, request.username(), request.password());
+            User user = jdbc.queryForObject("SELECT * FROM users WHERE username=? AND password=?", userMapper, request.username(), request.password());
+            if (user.status == UserStatus.PENDING) {
+                throw new IllegalArgumentException("账号正在等待管理员审核，审核通过后方可登录");
+            }
+            if (user.status != UserStatus.ACTIVE) {
+                throw new IllegalArgumentException("账号当前状态不可登录：" + user.status);
+            }
+            return user;
         } catch (EmptyResultDataAccessException exception) {
             throw new IllegalArgumentException("用户名或密码错误");
         }
     }
 
     public User register(RegisterRequest request, String licenseImage, String idCardImage) {
+        validateRegister(request, licenseImage, idCardImage);
         Integer count = jdbc.queryForObject("SELECT COUNT(*) FROM users WHERE username=?", Integer.class, request.username());
         if (count != null && count > 0) {
             throw new IllegalArgumentException("用户名已存在");
         }
         Role role = request.role() == null ? Role.BUYER : request.role();
-        UserStatus status = role == Role.MERCHANT ? UserStatus.PENDING : UserStatus.ACTIVE;
+        UserStatus status = role == Role.ADMIN ? UserStatus.ACTIVE : UserStatus.PENDING;
         long id = insert("""
-                INSERT INTO users(username,password,phone,role,status,wallet,points,shop_name,license_image,id_card_image,merchant_level,fee_rate,favorable_rate)
-                VALUES(?,?,?,?,?,500,1200,?,?,?,?,?,100)
+                INSERT INTO users(username,password,real_name,phone,email,city,gender,bank_account,role,status,wallet,points,shop_name,license_image,id_card_image,merchant_level,fee_rate,favorable_rate)
+                VALUES(?,?,?,?,?,?,?,?,?,?,500,1200,?,?,?,?,?,100)
                 """, ps -> {
             ps.setString(1, request.username());
             ps.setString(2, request.password());
-            ps.setString(3, request.phone());
-            ps.setString(4, role.name());
-            ps.setString(5, status.name());
-            ps.setString(6, request.shopName());
-            ps.setString(7, licenseImage);
-            ps.setString(8, idCardImage);
-            ps.setInt(9, 3);
-            ps.setBigDecimal(10, feeRateOf(3));
+            ps.setString(3, request.realName());
+            ps.setString(4, request.phone());
+            ps.setString(5, request.email());
+            ps.setString(6, request.city());
+            ps.setString(7, request.gender());
+            ps.setString(8, request.bankAccount());
+            ps.setString(9, role.name());
+            ps.setString(10, status.name());
+            ps.setString(11, request.shopName());
+            ps.setString(12, licenseImage);
+            ps.setString(13, idCardImage);
+            ps.setInt(14, 3);
+            ps.setBigDecimal(15, feeRateOf(3));
         });
         return user(id);
     }
@@ -293,7 +315,7 @@ public class MarketplaceService {
     }
 
     public List<User> pendingMerchants() {
-        return jdbc.query("SELECT * FROM users WHERE role='MERCHANT' AND status='PENDING' ORDER BY id", userMapper);
+        return jdbc.query("SELECT * FROM users WHERE status='PENDING' ORDER BY id", userMapper);
     }
 
     public List<Product> productsByStatus(ProductStatus status) {
@@ -404,6 +426,37 @@ public class MarketplaceService {
                 FROM products p
                 JOIN users u ON u.id=p.merchant_id
                 """ + " " + suffix;
+    }
+
+    private void validateRegister(RegisterRequest request, String licenseImage, String idCardImage) {
+        Role role = request.role() == null ? Role.BUYER : request.role();
+        require(request.username(), "登录账号不能为空");
+        require(request.password(), "密码不能为空");
+        require(request.realName(), "姓名不能为空");
+        require(request.phone(), "手机号不能为空");
+        if (!request.phone().matches("1\\d{10}")) {
+            throw new IllegalArgumentException("手机号必须为11位数字且以1开头");
+        }
+        require(request.gender(), "性别不能为空");
+        require(request.bankAccount(), "银行账号不能为空");
+        if (!request.bankAccount().matches("\\d{16}")) {
+            throw new IllegalArgumentException("银行账号必须为16位数字");
+        }
+        if (role == Role.BUYER) {
+            require(request.email(), "邮箱不能为空");
+            require(request.city(), "城市不能为空");
+        }
+        if (role == Role.MERCHANT) {
+            require(request.shopName(), "店铺名不能为空");
+            require(licenseImage, "商家注册必须上传营业执照");
+            require(idCardImage, "商家注册必须上传身份证图片");
+        }
+    }
+
+    private void require(String value, String message) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(message);
+        }
     }
 
     private void recalculateRates(long merchantId, Long productId) {
