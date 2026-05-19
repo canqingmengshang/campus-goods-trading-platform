@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="520" viewBox="0 0 760 520">
+  <rect width="760" height="520" fill="#f0fdf4"/>
+  <path d="M170 120h185c38 0 68 30 68 68v224H238c-38 0-68-30-68-68z" fill="#ffffff" stroke="#059669" stroke-width="10"/>
+  <path d="M423 188c0-38 30-68 68-68h100v292H423z" fill="#dcfce7" stroke="#059669" stroke-width="10"/>
+  <path d="M238 196h120M238 250h120M490 196h70M490 250h70" stroke="#1f365f" stroke-width="10" stroke-linecap="round"/>
+  <text x="380" y="460" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#166534">考研英语真题套装</text>
+</svg>
