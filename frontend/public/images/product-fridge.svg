@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="760" height="520" viewBox="0 0 760 520">
-  <rect width="760" height="520" fill="#f8fafc"/>
-  <rect x="270" y="70" width="220" height="370" rx="24" fill="#ffffff" stroke="#2563eb" stroke-width="12"/>
-  <path d="M270 205h220" stroke="#93c5fd" stroke-width="10"/>
-  <path d="M448 135v42M448 260v70" stroke="#1f365f" stroke-width="12" stroke-linecap="round"/>
-  <text x="380" y="490" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#1f365f">宿舍小冰箱</text>
-</svg>

@@ -2,8 +2,12 @@ const {createApp} = Vue;
 
 const api = {
     async request(url, options = {}) {
-        const response = await fetch(url, options);
+        const response = await fetch(url, {...options, credentials: 'include'});
         const data = await response.json().catch(() => ({}));
+        if (!response.ok && response.status === 401) {
+            session.clear();
+            if (location.pathname !== '/login') nav('/login');
+        }
         if (!response.ok) throw new Error(data.message || '操作失败');
         return data;
     },
@@ -686,7 +690,16 @@ const routes = [
     [/^\/admin\/users$/, AdminUsers]
 ];
 
-createApp({
+async function bootstrap() {
+    try {
+        const user = await api.get('/api/session');
+        session.save(user);
+    } catch (error) {
+        session.clear();
+        if (location.pathname !== '/login') history.replaceState({}, '', '/login');
+    }
+
+    createApp({
     data() {
         return {path: safePath(location.pathname), user: session.current};
     },
@@ -720,6 +733,7 @@ createApp({
         logout() {
             session.clear();
             this.user = null;
+            api.post('/api/logout').catch(() => {});
             nav('/login');
         }
     },
@@ -740,4 +754,7 @@ createApp({
       </header>
       <component :is="view"></component>
     </div>`
-}).mount('#app');
+    }).mount('#app');
+}
+
+bootstrap();

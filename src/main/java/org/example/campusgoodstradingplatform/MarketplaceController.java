@@ -10,6 +10,9 @@ import org.example.campusgoodstradingplatform.CampusStoreData.PunishRequest;
 import org.example.campusgoodstradingplatform.CampusStoreData.RechargeRequest;
 import org.example.campusgoodstradingplatform.CampusStoreData.RegisterRequest;
 import org.example.campusgoodstradingplatform.CampusStoreData.ReviewRequest;
+import org.example.campusgoodstradingplatform.CampusStoreData.Role;
+import org.example.campusgoodstradingplatform.CampusStoreData.User;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -55,9 +58,23 @@ public class MarketplaceController {
     @PostMapping("/api/login")
     public Object login(@RequestBody LoginRequest request, HttpSession session) {
         String expectedCaptcha = (String) session.getAttribute("LOGIN_CAPTCHA");
-        Object user = service.login(request, expectedCaptcha);
+        User user = service.login(request, expectedCaptcha);
+        session.setAttribute("LOGIN_USER_ID", user.id);
         session.removeAttribute("LOGIN_CAPTCHA");
         return user;
+    }
+
+    @ResponseBody
+    @GetMapping("/api/session")
+    public Object session(HttpSession session) {
+        return requireUser(session);
+    }
+
+    @ResponseBody
+    @PostMapping("/api/logout")
+    public Object logout(HttpSession session) {
+        session.invalidate();
+        return Map.of("ok", true);
     }
 
     @ResponseBody
@@ -70,7 +87,8 @@ public class MarketplaceController {
 
     @ResponseBody
     @PostMapping("/api/uploads")
-    public Object upload(@RequestParam("files") List<MultipartFile> files) {
+    public Object upload(@RequestParam("files") List<MultipartFile> files, HttpSession session) {
+        requireRole(session, Role.MERCHANT);
         return fileStorage.saveAll(files);
     }
 
@@ -79,136 +97,194 @@ public class MarketplaceController {
     public Object products(@RequestParam(required = false) String keyword,
                            @RequestParam(required = false) String sort,
                            @RequestParam(required = false) BigDecimal minPrice,
-                           @RequestParam(required = false) BigDecimal maxPrice) {
+                           @RequestParam(required = false) BigDecimal maxPrice,
+                           HttpSession session) {
+        requireUser(session);
         return service.searchProducts(keyword, sort, minPrice, maxPrice);
     }
 
     @ResponseBody
     @GetMapping("/api/products/{id}")
-    public Object product(@PathVariable long id) {
+    public Object product(@PathVariable long id, HttpSession session) {
+        requireUser(session);
         return service.product(id);
     }
 
     @ResponseBody
     @GetMapping("/api/shops/{merchantId}/products")
-    public Object shopProducts(@PathVariable long merchantId) {
+    public Object shopProducts(@PathVariable long merchantId, HttpSession session) {
+        requireUser(session);
         return service.shopProducts(merchantId);
     }
 
     @ResponseBody
     @GetMapping("/api/users/{userId}")
-    public Object user(@PathVariable long userId) {
+    public Object user(@PathVariable long userId, HttpSession session) {
+        requireSelfOrAdmin(session, userId);
         return service.user(userId);
     }
 
     @ResponseBody
     @GetMapping("/api/users/{userId}/orders")
-    public Object userOrders(@PathVariable long userId) {
+    public Object userOrders(@PathVariable long userId, HttpSession session) {
+        requireSelfOrAdmin(session, userId);
         return service.userOrders(userId);
     }
 
     @ResponseBody
     @GetMapping("/api/users/{userId}/cart")
-    public Object cart(@PathVariable long userId) {
+    public Object cart(@PathVariable long userId, HttpSession session) {
+        requireSelfOrAdmin(session, userId);
         return service.cart(userId);
     }
 
     @ResponseBody
     @PostMapping("/api/users/{userId}/cart/{productId}")
     public Object addToCart(@PathVariable long userId, @PathVariable long productId,
-                            @RequestParam(defaultValue = "1") int quantity) {
+                            @RequestParam(defaultValue = "1") int quantity,
+                            HttpSession session) {
+        requireSelfOrAdmin(session, userId);
         return service.addToCart(userId, productId, quantity);
     }
 
     @ResponseBody
     @PutMapping("/api/users/{userId}/cart")
-    public Object updateCart(@PathVariable long userId, @RequestBody List<CartItem> items) {
+    public Object updateCart(@PathVariable long userId, @RequestBody List<CartItem> items, HttpSession session) {
+        requireSelfOrAdmin(session, userId);
         return service.updateCart(userId, items);
     }
 
     @ResponseBody
     @PostMapping("/api/users/{userId}/checkout")
-    public Object checkout(@PathVariable long userId, @RequestParam(defaultValue = "0") int pointsUsed) {
+    public Object checkout(@PathVariable long userId, @RequestParam(defaultValue = "0") int pointsUsed, HttpSession session) {
+        requireSelfOrAdmin(session, userId);
         return service.checkout(userId, pointsUsed);
     }
 
     @ResponseBody
     @PostMapping("/api/orders/{orderId}/received")
-    public Object received(@PathVariable long orderId) {
+    public Object received(@PathVariable long orderId, HttpSession session) {
+        requireUser(session);
         return service.markReceived(orderId);
     }
 
     @ResponseBody
     @PostMapping("/api/orders/{orderId}/return")
     public Object requestReturn(@PathVariable long orderId,
-                                @RequestParam(defaultValue = "24小时内退货申请") String reason) {
+                                @RequestParam(defaultValue = "24小时内退货申请") String reason,
+                                HttpSession session) {
+        requireUser(session);
         return service.requestReturn(orderId, reason);
     }
 
     @ResponseBody
     @PostMapping("/api/users/{userId}/reviews")
-    public Object review(@PathVariable long userId, @RequestBody ReviewRequest request) {
+    public Object review(@PathVariable long userId, @RequestBody ReviewRequest request, HttpSession session) {
+        requireSelfOrAdmin(session, userId);
         return service.review(userId, request);
     }
 
     @ResponseBody
     @PostMapping("/api/merchants/{merchantId}/products")
-    public Object saveProduct(@PathVariable long merchantId, @RequestBody ProductRequest request) {
+    public Object saveProduct(@PathVariable long merchantId, @RequestBody ProductRequest request, HttpSession session) {
+        requireSelfOrAdmin(session, merchantId);
+        requireRole(session, Role.MERCHANT);
         return service.saveProduct(merchantId, request);
     }
 
     @ResponseBody
     @PostMapping("/api/products/{productId}/status")
-    public Object productStatus(@PathVariable long productId, @RequestParam ProductStatus status) {
+    public Object productStatus(@PathVariable long productId, @RequestParam ProductStatus status, HttpSession session) {
+        User user = requireUser(session);
+        if (user.role != Role.ADMIN && user.role != Role.MERCHANT) {
+            throw new SecurityException("无权调整商品状态");
+        }
         return service.setProductStatus(productId, status);
     }
 
     @ResponseBody
     @GetMapping("/api/admin/users")
-    public Object adminUsers() {
+    public Object adminUsers(HttpSession session) {
+        requireRole(session, Role.ADMIN);
         return service.users();
     }
 
     @ResponseBody
     @GetMapping("/api/admin/pending-merchants")
-    public Object pendingMerchants() {
+    public Object pendingMerchants(HttpSession session) {
+        requireRole(session, Role.ADMIN);
         return service.pendingMerchants();
     }
 
     @ResponseBody
     @GetMapping("/api/admin/products")
-    public Object adminProducts(@RequestParam(required = false) ProductStatus status) {
+    public Object adminProducts(@RequestParam(required = false) ProductStatus status, HttpSession session) {
+        requireRole(session, Role.ADMIN);
         return service.productsByStatus(status);
     }
 
     @ResponseBody
     @PostMapping("/api/admin/users/{userId}/approve")
-    public Object approveUser(@PathVariable long userId) {
+    public Object approveUser(@PathVariable long userId, HttpSession session) {
+        requireRole(session, Role.ADMIN);
         return service.approveUser(userId);
     }
 
     @ResponseBody
     @PostMapping("/api/admin/recharge")
-    public Object recharge(@RequestBody RechargeRequest request) {
+    public Object recharge(@RequestBody RechargeRequest request, HttpSession session) {
+        requireRole(session, Role.ADMIN);
         return service.recharge(request);
     }
 
     @ResponseBody
     @PostMapping("/api/admin/punish")
-    public Object punish(@RequestBody PunishRequest request) {
+    public Object punish(@RequestBody PunishRequest request, HttpSession session) {
+        requireRole(session, Role.ADMIN);
         return service.punish(request);
     }
 
     @ResponseBody
     @PostMapping("/api/admin/fee")
-    public Object fee(@RequestBody FeeRequest request) {
+    public Object fee(@RequestBody FeeRequest request, HttpSession session) {
+        requireRole(session, Role.ADMIN);
         return service.setFee(request);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<Map<String, String>> unauthorized(SecurityException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", exception.getMessage()));
     }
 
     @ResponseBody
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> badRequest(IllegalArgumentException exception) {
         return ResponseEntity.badRequest().body(Map.of("message", exception.getMessage()));
+    }
+
+    private User requireUser(HttpSession session) {
+        Object userId = session.getAttribute("LOGIN_USER_ID");
+        if (!(userId instanceof Long id)) {
+            throw new SecurityException("请先登录");
+        }
+        return service.user(id);
+    }
+
+    private User requireSelfOrAdmin(HttpSession session, long userId) {
+        User user = requireUser(session);
+        if (user.id != userId && user.role != Role.ADMIN) {
+            throw new SecurityException("无权访问该用户数据");
+        }
+        return user;
+    }
+
+    private User requireRole(HttpSession session, Role role) {
+        User user = requireUser(session);
+        if (user.role != role) {
+            throw new SecurityException("无权访问该功能");
+        }
+        return user;
     }
 
     private String randomCaptcha() {

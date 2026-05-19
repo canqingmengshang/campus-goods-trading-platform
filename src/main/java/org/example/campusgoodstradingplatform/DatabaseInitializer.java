@@ -135,11 +135,11 @@ public class DatabaseInitializer implements CommandLineRunner {
         jdbc.update("""
                 INSERT INTO products(merchant_id, name, category, original_price, sale_price, size, photos, usage_guide, negotiable, stock, sales, condition_text, status, favorable_rate)
                 VALUES
-                (3,'九成新山地车','出行',899,650,'26寸','/images/product-bike.svg','线下校园面交，支持验货后确认收货。',1,3,28,'九成新','PUBLISHED',98.40),
-                (3,'考研英语真题套装','图书',128,56,'12册','/images/product-book.svg','资料完整无缺页，可在教学楼自取。',0,12,61,'七成新','PUBLISHED',96.80),
-                (3,'宿舍小冰箱','电器',699,420,'48L','/images/product-fridge.svg','通电正常，支持现场验货。',1,2,17,'九成新','PUBLISHED',94.20),
-                (3,'机械键盘青轴','数码',299,169,'87键','/images/product-keyboard.svg','按键正常，附数据线。',0,8,43,'九成新','PUBLISHED',97.60),
-                (4,'摄影补光灯套装','数码',260,118,'双灯','/images/product-light.svg','适合社团拍摄和直播。',1,5,0,'九成新','PUBLISHED',100.00)
+                (3,'九成新山地车','出行',899,650,'26寸','/images/product-bike.jpg','线下校园面交，支持验货后确认收货。',1,3,28,'九成新','PUBLISHED',98.40),
+                (3,'考研英语真题套装','图书',128,56,'12册','/images/product-book.jpg','资料完整无缺页，可在教学楼自取。',0,12,61,'七成新','PUBLISHED',96.80),
+                (3,'宿舍小冰箱','电器',699,420,'48L','/images/product-fridge.jpg','通电正常，支持现场验货。',1,2,17,'九成新','PUBLISHED',94.20),
+                (3,'机械键盘青轴','数码',299,169,'87键','/images/product-keyboard.jpg','按键正常，附数据线。',0,8,43,'九成新','PUBLISHED',97.60),
+                (4,'摄影补光灯套装','数码',260,118,'双灯','/images/product-light.jpg','适合社团拍摄和直播。',1,5,0,'九成新','PUBLISHED',100.00)
                 """);
     }
 

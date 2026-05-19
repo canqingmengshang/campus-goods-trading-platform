@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="760" height="520" viewBox="0 0 760 520">
-  <rect width="760" height="520" fill="#fff7ed"/>
-  <rect x="100" y="150" width="560" height="220" rx="28" fill="#ffffff" stroke="#ea580c" stroke-width="12"/>
-  <g fill="#fed7aa">
-    <rect x="145" y="195" width="52" height="38" rx="8"/><rect x="215" y="195" width="52" height="38" rx="8"/><rect x="285" y="195" width="52" height="38" rx="8"/><rect x="355" y="195" width="52" height="38" rx="8"/><rect x="425" y="195" width="52" height="38" rx="8"/><rect x="495" y="195" width="52" height="38" rx="8"/>
-    <rect x="145" y="255" width="402" height="42" rx="8"/>
-  </g>
-  <text x="380" y="445" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#9a3412">机械键盘青轴</text>
-</svg>
