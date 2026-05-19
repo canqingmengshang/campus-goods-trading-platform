@@ -237,7 +237,7 @@ const Home = {
 
 const ProductDetail = {
     data() {
-        return {product: null, active: 0, quantity: 1, msg: ''};
+        return {product: null, quantity: 1, msg: ''};
     },
     async mounted() {
         this.product = await api.get('/api/products/' + location.pathname.split('/').pop());
@@ -253,8 +253,7 @@ const ProductDetail = {
     <main class="container" v-if="product">
       <section class="split">
         <div class="panel detail-media">
-          <img class="product-img" :src="product.photos[active]">
-          <div class="thumbs"><img v-for="(img,i) in product.photos" :src="img" :class="{active:i===active}" @click="active=i"></div>
+          <img class="product-img" :src="product.photos[0]">
         </div>
         <div class="panel">
           <h2>{{product.name}}</h2>
