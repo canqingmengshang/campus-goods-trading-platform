@@ -43,6 +43,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         addColumnIfMissing("users", "city", "VARCHAR(64)");
         addColumnIfMissing("users", "gender", "VARCHAR(20)");
         addColumnIfMissing("users", "bank_account", "CHAR(16)");
+        fillInitialUserProfiles();
 
         jdbc.execute("""
                 CREATE TABLE IF NOT EXISTS products (
@@ -140,6 +141,29 @@ public class DatabaseInitializer implements CommandLineRunner {
                 (3,'宿舍小冰箱','电器',699,420,'48L','/images/product-fridge.jpg','通电正常，支持现场验货。',1,2,17,'九成新','PUBLISHED',94.20),
                 (3,'机械键盘青轴','数码',299,169,'87键','/images/product-keyboard.jpg','按键正常，附数据线。',0,8,43,'九成新','PUBLISHED',97.60),
                 (4,'摄影补光灯套装','数码',260,118,'双灯','/images/product-light.jpg','适合社团拍摄和直播。',1,5,0,'九成新','PUBLISHED',100.00)
+                """);
+    }
+
+    private void fillInitialUserProfiles() {
+        jdbc.update("""
+                UPDATE users
+                SET real_name='平台管理员', email='admin@campus.test', city='杭州', gender='男'
+                WHERE id=1 AND username='admin'
+                """);
+        jdbc.update("""
+                UPDATE users
+                SET real_name='学生买家', email='buyer@campus.test', city='杭州', gender='女'
+                WHERE id=2 AND username='buyer'
+                """);
+        jdbc.update("""
+                UPDATE users
+                SET real_name='商家负责人', email='merchant@campus.test', city='杭州', gender='男'
+                WHERE id=3 AND username='merchant'
+                """);
+        jdbc.update("""
+                UPDATE users
+                SET real_name='新店负责人', email='newshop@campus.test', city='杭州', gender='女'
+                WHERE id=4 AND username='newshop'
                 """);
     }
 

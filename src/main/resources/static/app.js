@@ -318,6 +318,13 @@ const Cart = {
         async save() {
             this.items = await api.put('/api/users/' + session.current.id + '/cart', this.items);
         },
+        async removeItem(productId) {
+            const removed = this.products[productId]?.name || '商品';
+            this.items = this.items.filter(item => item.productId !== productId);
+            this.items = await api.put('/api/users/' + session.current.id + '/cart', this.items);
+            delete this.products[productId];
+            this.msg = removed + ' 已从购物车删除';
+        },
         async checkout() {
             if (this.pointsUsed > Number(this.user.points || 0)) {
                 this.pointsUsed = Number(this.user.points || 0);
@@ -347,6 +354,7 @@ const Cart = {
         <td><input type="checkbox" v-model="item.selected"></td><td>{{products[item.productId]?.name}}</td><td>{{products[item.productId]?.merchantName}}</td>
         <td>¥{{money(products[item.productId]?.salePrice)}}</td><td><input type="number" min="1" v-model.number="item.quantity" style="width:90px"></td>
         <td>¥{{money(Number(products[item.productId]?.salePrice || 0) * item.quantity)}}</td>
+        <td><button class="danger" @click="removeItem(item.productId)">删除</button></td>
       </tr></tbody></table>
       <div class="actions"><label style="max-width:220px">积分抵扣<input type="number" min="0" :max="user.points" v-model.number="pointsUsed"></label><b>合计 ¥{{money(total)}}，应付 ¥{{money(payable)}}</b><button @click="checkout">一键下单并扣款</button></div>
       <p class="muted">100 积分 = 1 元。</p><p v-if="msg" class="notice">{{msg}}</p>
