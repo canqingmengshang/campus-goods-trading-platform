@@ -12,6 +12,7 @@ import org.example.campusgoodstradingplatform.entity.CartItem;
 import org.example.campusgoodstradingplatform.entity.ProductStatus;
 import org.example.campusgoodstradingplatform.entity.Role;
 import org.example.campusgoodstradingplatform.entity.User;
+import org.example.campusgoodstradingplatform.entity.UserStatus;
 import org.example.campusgoodstradingplatform.service.FileStorageService;
 import org.example.campusgoodstradingplatform.service.MarketplaceService;
 import org.springframework.http.HttpStatus;
@@ -270,7 +271,11 @@ public class MarketplaceController {
         if (!(userId instanceof Long id)) {
             throw new SecurityException("请先登录");
         }
-        return service.user(id);
+        User user = service.user(id);
+        if (user.status == UserStatus.LIMITED) {
+            throw new SecurityException("账号已被限制，无法进行操作");
+        }
+        return user;
     }
 
     private User requireSelfOrAdmin(HttpSession session, long userId) {

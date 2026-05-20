@@ -105,6 +105,11 @@ public class MarketplaceMapper {
         return Map.of("image", image);
     }
 
+    /*
+     * 验证登录验证码。
+     * 查询账号密码。
+     * 判断用户状态是否允许登录。
+     */
     public User login(LoginRequest request, String expectedCaptcha) {
         if (expectedCaptcha == null || request.captcha() == null
                 || request.captcha().isBlank()
@@ -116,7 +121,7 @@ public class MarketplaceMapper {
             if (user.status == UserStatus.PENDING) {
                 throw new IllegalArgumentException("账号正在等待管理员审核，审核通过后方可登录");
             }
-            if (user.status != UserStatus.ACTIVE) {
+            if (user.status != UserStatus.ACTIVE && user.status != UserStatus.LIMITED) {
                 throw new IllegalArgumentException("账号当前状态不可登录：" + user.status);
             }
             return user;
@@ -125,6 +130,11 @@ public class MarketplaceMapper {
         }
     }
 
+    /*
+     * 校验注册信息。
+     * 检查用户名是否重复。
+     * 根据用户角色设置初始审核状态。
+     */
     public User register(RegisterRequest request, String licenseImage, String idCardImage) {
         validateRegister(request, licenseImage, idCardImage);
         Integer count = jdbc.queryForObject("SELECT COUNT(*) FROM users WHERE username=?", Integer.class, request.username());
@@ -156,6 +166,11 @@ public class MarketplaceMapper {
         return user(id);
     }
 
+    /*
+     * 按关键词搜索已发布商品。
+     * 按价格区间筛选。
+     * 按价格、销量、好评率等规则排序。
+     */
     public List<Product> searchProducts(String keyword, String sort, BigDecimal minPrice, BigDecimal maxPrice) {
         String orderBy = switch (sort == null ? "" : sort) {
             case "price" -> "p.sale_price ASC";
@@ -193,6 +208,11 @@ public class MarketplaceMapper {
                 }, userId);
     }
 
+    /*
+     * 校验商品是否存在。
+     * 将商品加入购物车。
+     * 已存在时累加购买数量。
+     */
     public List<CartItem> addToCart(long userId, long productId, int quantity) {
         product(productId);
         jdbc.update("""
@@ -203,6 +223,11 @@ public class MarketplaceMapper {
         return cart(userId);
     }
 
+    /*
+     * 清空用户原购物车记录。
+     * 按前端提交内容重新保存购物车。
+     * 保证购物车数量最小为1。
+     */
     @Transactional
     public List<CartItem> updateCart(long userId, List<CartItem> items) {
         jdbc.update("DELETE FROM cart_items WHERE user_id=?", userId);
@@ -215,6 +240,11 @@ public class MarketplaceMapper {
         return cart(userId);
     }
 
+    /*
+     * 生成订单并完成结算。
+     * 检查库存、积分和钱包余额。
+     * 扣减库存、销量、钱包余额和积分。
+     */
     @Transactional
     public Order checkout(long userId, int pointsUsed) {
         User user = user(userId);
@@ -247,7 +277,8 @@ public class MarketplaceMapper {
                     orderId, item.productId, item.quantity, product.salePrice);
             jdbc.update("UPDATE products SET stock=stock-?, sales=sales+? WHERE id=?", item.quantity, item.quantity, item.productId);
         }
-        jdbc.update("UPDATE users SET wallet=wallet-?, points=points-? WHERE id=?", payable, usablePoints, userId);
+        int earnedPoints = payable.setScale(0, RoundingMode.DOWN).intValue();
+        jdbc.update("UPDATE users SET wallet=wallet-?, points=points-?+? WHERE id=?", payable, usablePoints, earnedPoints, userId);
         jdbc.update("DELETE FROM cart_items WHERE user_id=? AND selected=1", userId);
         return order(orderId);
     }
@@ -256,11 +287,20 @@ public class MarketplaceMapper {
         return jdbc.query("SELECT * FROM orders WHERE buyer_id=? ORDER BY id DESC", orderMapper(), userId);
     }
 
+    /*
+     * 将订单状态更新为已收货。
+     * 记录收货时间。
+     */
     public Order markReceived(long orderId) {
         jdbc.update("UPDATE orders SET status=?, received_at=NOW() WHERE id=?", OrderStatus.RECEIVED.name(), orderId);
         return order(orderId);
     }
 
+    /*
+     * 校验订单是否在收货后24小时内。
+     * 提交退货申请原因。
+     * 将订单状态更新为退货申请中。
+     */
     public Order requestReturn(long orderId, String reason) {
         Order order = order(orderId);
         LocalDateTime receivedAt = order.receivedAt == null ? LocalDateTime.now() : order.receivedAt;
@@ -271,6 +311,11 @@ public class MarketplaceMapper {
         return order(orderId);
     }
 
+    /*
+     * 保存用户评价。
+     * 关联订单、商家和商品。
+     * 重新计算商家和商品好评率。
+     */
     public Review review(long userId, ReviewRequest request) {
         long id = insert("INSERT INTO reviews(order_id,user_id,merchant_id,product_id,stars,content) VALUES(?,?,?,?,?,?)", ps -> {
             ps.setLong(1, request.orderId());
@@ -284,6 +329,11 @@ public class MarketplaceMapper {
         return review(id);
     }
 
+    /*
+     * 校验商家发布权限。
+     * 新增或编辑商品信息。
+     * 将商品提交到待审核状态。
+     */
     public Product saveProduct(long merchantId, ProductRequest request) {
         User merchant = user(merchantId);
         if (merchant.status == UserStatus.LIMITED || merchant.status == UserStatus.BLACKLISTED) {
@@ -305,6 +355,10 @@ public class MarketplaceMapper {
         return product(request.id());
     }
 
+    /*
+     * 调整商品状态。
+     * 支持审核上架、下架、锁定等状态流转。
+     */
     public Product setProductStatus(long productId, ProductStatus status) {
         jdbc.update("UPDATE products SET status=? WHERE id=?", status.name(), productId);
         return product(productId);
@@ -325,16 +379,28 @@ public class MarketplaceMapper {
         return jdbc.query(productSql("WHERE p.status=? ORDER BY p.id DESC"), productMapper, status.name());
     }
 
+    /*
+     * 管理员审核用户。
+     * 将待审核用户状态改为正常可用。
+     */
     public User approveUser(long userId) {
         jdbc.update("UPDATE users SET status='ACTIVE' WHERE id=?", userId);
         return user(userId);
     }
 
+    /*
+     * 管理员为用户充值。
+     * 增加用户钱包余额。
+     */
     public User recharge(RechargeRequest request) {
         jdbc.update("UPDATE users SET wallet=wallet+? WHERE id=?", nvl(request.amount(), BigDecimal.ZERO), request.userId());
         return user(request.userId());
     }
 
+    /*
+     * 调整用户处罚状态。
+     * 限制或拉黑商家时同步锁定其商品。
+     */
     public User punish(PunishRequest request) {
         jdbc.update("UPDATE users SET status=? WHERE id=?", request.status().name(), request.userId());
         if (request.status() == UserStatus.LIMITED || request.status() == UserStatus.BLACKLISTED) {
@@ -343,6 +409,10 @@ public class MarketplaceMapper {
         return user(request.userId());
     }
 
+    /*
+     * 设置商家等级。
+     * 根据等级更新商家手续费率。
+     */
     public User setFee(FeeRequest request) {
         int level = Math.max(1, Math.min(5, request.level()));
         jdbc.update("UPDATE users SET merchant_level=?, fee_rate=? WHERE id=?", level, feeRateOf(level), request.merchantId());
