@@ -1,4 +1,4 @@
-package org.example.campusgoodstradingplatform;
+package org.example.campusgoodstradingplatform.config;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -1,4 +1,4 @@
-package org.example.campusgoodstradingplatform;
+package org.example.campusgoodstradingplatform.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

@@ -1,27 +1,27 @@
-package org.example.campusgoodstradingplatform;
+package org.example.campusgoodstradingplatform.mapper;
 
-import org.example.campusgoodstradingplatform.CampusStoreData.CartItem;
-import org.example.campusgoodstradingplatform.CampusStoreData.FeeRequest;
-import org.example.campusgoodstradingplatform.CampusStoreData.LoginRequest;
-import org.example.campusgoodstradingplatform.CampusStoreData.Order;
-import org.example.campusgoodstradingplatform.CampusStoreData.OrderStatus;
-import org.example.campusgoodstradingplatform.CampusStoreData.Product;
-import org.example.campusgoodstradingplatform.CampusStoreData.ProductRequest;
-import org.example.campusgoodstradingplatform.CampusStoreData.ProductStatus;
-import org.example.campusgoodstradingplatform.CampusStoreData.PunishRequest;
-import org.example.campusgoodstradingplatform.CampusStoreData.RechargeRequest;
-import org.example.campusgoodstradingplatform.CampusStoreData.RegisterRequest;
-import org.example.campusgoodstradingplatform.CampusStoreData.Review;
-import org.example.campusgoodstradingplatform.CampusStoreData.ReviewRequest;
-import org.example.campusgoodstradingplatform.CampusStoreData.Role;
-import org.example.campusgoodstradingplatform.CampusStoreData.User;
-import org.example.campusgoodstradingplatform.CampusStoreData.UserStatus;
+import org.example.campusgoodstradingplatform.dto.FeeRequest;
+import org.example.campusgoodstradingplatform.dto.LoginRequest;
+import org.example.campusgoodstradingplatform.dto.ProductRequest;
+import org.example.campusgoodstradingplatform.dto.PunishRequest;
+import org.example.campusgoodstradingplatform.dto.RechargeRequest;
+import org.example.campusgoodstradingplatform.dto.RegisterRequest;
+import org.example.campusgoodstradingplatform.dto.ReviewRequest;
+import org.example.campusgoodstradingplatform.entity.CartItem;
+import org.example.campusgoodstradingplatform.entity.Order;
+import org.example.campusgoodstradingplatform.entity.OrderStatus;
+import org.example.campusgoodstradingplatform.entity.Product;
+import org.example.campusgoodstradingplatform.entity.ProductStatus;
+import org.example.campusgoodstradingplatform.entity.Review;
+import org.example.campusgoodstradingplatform.entity.Role;
+import org.example.campusgoodstradingplatform.entity.User;
+import org.example.campusgoodstradingplatform.entity.UserStatus;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -39,11 +39,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-@Service
-public class MarketplaceService {
+@Repository
+public class MarketplaceMapper {
     private final JdbcTemplate jdbc;
 
-    public MarketplaceService(JdbcTemplate jdbc) {
+    public MarketplaceMapper(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
 
