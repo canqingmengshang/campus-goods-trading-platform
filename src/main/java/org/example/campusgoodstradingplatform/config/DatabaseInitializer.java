@@ -1,20 +1,20 @@
 package org.example.campusgoodstradingplatform.config;
 
+import org.example.campusgoodstradingplatform.mapper.DatabaseInitMapper;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DatabaseInitializer implements CommandLineRunner {
-    private final JdbcTemplate jdbc;
+    private final DatabaseInitMapper database;
 
-    public DatabaseInitializer(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
+    public DatabaseInitializer(DatabaseInitMapper database) {
+        this.database = database;
     }
 
     @Override
     public void run(String... args) {
-        jdbc.execute("""
+        database.execute("""
                 CREATE TABLE IF NOT EXISTS users (
                     id BIGINT PRIMARY KEY AUTO_INCREMENT,
                     username VARCHAR(64) NOT NULL UNIQUE,
@@ -45,7 +45,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         addColumnIfMissing("users", "bank_account", "CHAR(16)");
         fillInitialUserProfiles();
 
-        jdbc.execute("""
+        database.execute("""
                 CREATE TABLE IF NOT EXISTS products (
                     id BIGINT PRIMARY KEY AUTO_INCREMENT,
                     merchant_id BIGINT NOT NULL,
@@ -66,7 +66,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                     CONSTRAINT fk_products_merchant FOREIGN KEY (merchant_id) REFERENCES users(id)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
                 """);
-        jdbc.execute("""
+        database.execute("""
                 CREATE TABLE IF NOT EXISTS cart_items (
                     user_id BIGINT NOT NULL,
                     product_id BIGINT NOT NULL,
@@ -77,7 +77,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                     CONSTRAINT fk_cart_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
                 """);
-        jdbc.execute("""
+        database.execute("""
                 CREATE TABLE IF NOT EXISTS orders (
                     id BIGINT PRIMARY KEY AUTO_INCREMENT,
                     buyer_id BIGINT NOT NULL,
@@ -90,7 +90,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                     CONSTRAINT fk_orders_buyer FOREIGN KEY (buyer_id) REFERENCES users(id)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
                 """);
-        jdbc.execute("""
+        database.execute("""
                 CREATE TABLE IF NOT EXISTS order_items (
                     id BIGINT PRIMARY KEY AUTO_INCREMENT,
                     order_id BIGINT NOT NULL,
@@ -101,7 +101,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                     CONSTRAINT fk_order_items_product FOREIGN KEY (product_id) REFERENCES products(id)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
                 """);
-        jdbc.execute("""
+        database.execute("""
                 CREATE TABLE IF NOT EXISTS reviews (
                     id BIGINT PRIMARY KEY AUTO_INCREMENT,
                     order_id BIGINT NOT NULL,
@@ -118,14 +118,14 @@ public class DatabaseInitializer implements CommandLineRunner {
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
                 """);
 
-        Integer count = jdbc.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
-        if (count != null && count == 0) {
+        int count = database.countUsers();
+        if (count == 0) {
             seed();
         }
     }
 
     private void seed() {
-        jdbc.update("""
+        database.execute("""
                 INSERT INTO users(id, username, password, real_name, phone, email, city, gender, bank_account, role, status, wallet, points, shop_name, merchant_level, fee_rate, favorable_rate)
                 VALUES
                 (1,'admin','123456','平台管理员','13800000001','admin@campus.test','杭州','男','1111222233334444','ADMIN','ACTIVE',1000,2000,'平台管理',5,1.00,100),
@@ -133,7 +133,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                 (3,'merchant','123456','商家负责人','13800000003','merchant@campus.test','杭州','男','3333444455556666','MERCHANT','ACTIVE',800,1600,'梧桐二手铺',3,0.50,97.50),
                 (4,'newshop','123456','新店负责人','13800000004','newshop@campus.test','杭州','女','4444555566667777','MERCHANT','PENDING',800,1600,'新芽数码店',3,0.50,100)
                 """);
-        jdbc.update("""
+        database.execute("""
                 INSERT INTO products(merchant_id, name, category, original_price, sale_price, size, photos, usage_guide, negotiable, stock, sales, condition_text, status, favorable_rate)
                 VALUES
                 (3,'九成新山地车','出行',899,650,'26寸','/images/product-bike.jpg','线下校园面交，支持验货后确认收货。',1,3,28,'九成新','PUBLISHED',98.40),
@@ -145,22 +145,22 @@ public class DatabaseInitializer implements CommandLineRunner {
     }
 
     private void fillInitialUserProfiles() {
-        jdbc.update("""
+        database.execute("""
                 UPDATE users
                 SET real_name='平台管理员', email='admin@campus.test', city='杭州', gender='男'
                 WHERE id=1 AND username='admin'
                 """);
-        jdbc.update("""
+        database.execute("""
                 UPDATE users
                 SET real_name='学生买家', email='buyer@campus.test', city='杭州', gender='女'
                 WHERE id=2 AND username='buyer'
                 """);
-        jdbc.update("""
+        database.execute("""
                 UPDATE users
                 SET real_name='商家负责人', email='merchant@campus.test', city='杭州', gender='男'
                 WHERE id=3 AND username='merchant'
                 """);
-        jdbc.update("""
+        database.execute("""
                 UPDATE users
                 SET real_name='新店负责人', email='newshop@campus.test', city='杭州', gender='女'
                 WHERE id=4 AND username='newshop'
@@ -168,13 +168,9 @@ public class DatabaseInitializer implements CommandLineRunner {
     }
 
     private void addColumnIfMissing(String tableName, String columnName, String definition) {
-        Integer count = jdbc.queryForObject("""
-                SELECT COUNT(*)
-                FROM information_schema.columns
-                WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?
-                """, Integer.class, tableName, columnName);
-        if (count != null && count == 0) {
-            jdbc.execute("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + definition);
+        int count = database.countColumn(tableName, columnName);
+        if (count == 0) {
+            database.execute("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + definition);
         }
     }
 }
