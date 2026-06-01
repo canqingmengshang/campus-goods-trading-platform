@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="520" viewBox="0 0 760 520">
+  <rect width="760" height="520" fill="#eef5ff"/>
+  <rect x="120" y="110" width="520" height="300" rx="24" fill="#ffffff" stroke="#93b4e8" stroke-width="8"/>
+  <circle cx="240" cy="230" r="44" fill="#2563eb"/>
+  <path d="M180 350l118-96 72 62 70-82 140 116z" fill="#059669"/>
+  <text x="380" y="455" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#1f365f">Campus Goods</text>
+</svg>
