@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="515e5868-4d03-4a38-b0d7-739f7a459937" name="更改" comment="优化数据库部分">
+      <change beforePath="$PROJECT_DIR$/frontend.zip" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="22" />
+  </component>
+  <component name="Git.Merge.Settings">
+    <option name="BRANCH" value="dev" />
+  </component>
+  <component name="Git.Settings">
+    <option name="INCOMING_COMMITS_CHECK_STRATEGY" value="FETCH" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="dev" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;canqingmengshang&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/canqingmengshang/campus-goods-trading-platform&quot;,
+    &quot;accountId&quot;: &quot;61d4bfdf-6510-428a-b198-8116b8d47c79&quot;
+  }
+}</component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+        <option name="userSettingsFile" value="D:\programmer\apache-maven-3.9.12\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="MavenRunner">
+    <option name="jreName" value="23" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3DtAqQkpPFArx1iY2wnvYJCoazn" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Node.js.app.js.executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHELLCHECK.PATH": "C:\\Users\\28420\\AppData\\Roaming\\JetBrains\\IntelliJIdea2024.2\\plugins\\Shell Script\\shellcheck.exe",
+    "Spring Boot.CampusGoodsTradingPlatformApplication.executor": "Run",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "chenwenyu",
+    "git.auto.fetch.suggestion.counter": "1",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/JavaWeb",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.build.executor": "Run",
+    "npm.dev.executor": "Run",
+    "project.structure.last.edited": "Facet",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.20574713",
+    "settings.editor.selected.configurable": "ml.llm.AcpAgentsConfigurable",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\programmer\IDEA\wokespace\campus-goods-trading-platform\frontend\public\images" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Spring Boot.CampusGoodsTradingPlatformApplication">
+    <configuration name="CampusGoodsTradingPlatformApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="campus-goods-trading-platform" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="org.example.campusgoodstradingplatform.CampusGoodsTradingPlatformApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/frontend/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="npm.dev" />
+      <item itemvalue="Spring Boot.CampusGoodsTradingPlatformApplication" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.dev" />
+        <item itemvalue="npm.dev" />
+        <item itemvalue="npm.dev" />
+        <item itemvalue="npm.dev" />
+        <item itemvalue="npm.dev" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="515e5868-4d03-4a38-b0d7-739f7a459937" name="更改" comment="" />
+      <created>1779091183436</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1779091183436</updated>
+      <workItem from="1779091184610" duration="756000" />
+      <workItem from="1779093893348" duration="347000" />
+      <workItem from="1779154535168" duration="4914000" />
+      <workItem from="1779159479959" duration="3277000" />
+      <workItem from="1779184643183" duration="4370000" />
+      <workItem from="1779190517226" duration="602000" />
+      <workItem from="1779200270427" duration="5186000" />
+      <workItem from="1779238663372" duration="8014000" />
+      <workItem from="1779947433643" duration="152000" />
+      <workItem from="1780312683447" duration="4271000" />
+      <workItem from="1780316986995" duration="3378000" />
+      <workItem from="1780320755544" duration="1507000" />
+      <workItem from="1780322279511" duration="203000" />
+      <workItem from="1780322504288" duration="82000" />
+      <workItem from="1780322654022" duration="260000" />
+      <workItem from="1780323086856" duration="74000" />
+      <workItem from="1780325732375" duration="341000" />
+      <workItem from="1780326088708" duration="1749000" />
+    </task>
+    <task id="LOCAL-00001" summary="可运行版本">
+      <option name="closed" value="true" />
+      <created>1779157955597</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1779157955597</updated>
+    </task>
+    <task id="LOCAL-00002" summary="可运行版本">
+      <option name="closed" value="true" />
+      <created>1779157962212</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1779157962212</updated>
+    </task>
+    <task id="LOCAL-00003" summary="前端完善可运行版本">
+      <option name="closed" value="true" />
+      <created>1779158741810</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1779158741810</updated>
+    </task>
+    <task id="LOCAL-00004" summary="首页完善版本">
+      <option name="closed" value="true" />
+      <created>1779162522737</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1779162522737</updated>
+    </task>
+    <task id="LOCAL-00005" summary="首页完善版本">
+      <option name="closed" value="true" />
+      <created>1779162530666</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1779162530666</updated>
+    </task>
+    <task id="LOCAL-00006" summary="完善商品详情">
+      <option name="closed" value="true" />
+      <created>1779162766616</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1779162766616</updated>
+    </task>
+    <task id="LOCAL-00007" summary="完善店铺界面">
+      <option name="closed" value="true" />
+      <created>1779187276926</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1779187276926</updated>
+    </task>
+    <task id="LOCAL-00008" summary="完善店铺界面">
+      <option name="closed" value="true" />
+      <created>1779187282727</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1779187282727</updated>
+    </task>
+    <task id="LOCAL-00009" summary="完善订单详情界面">
+      <option name="closed" value="true" />
+      <created>1779188332567</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1779188332567</updated>
+    </task>
+    <task id="LOCAL-00010" summary="完善订单详情界面(2)">
+      <option name="closed" value="true" />
+      <created>1779200704065</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1779200704065</updated>
+    </task>
+    <task id="LOCAL-00011" summary="完善商品图片">
+      <option name="closed" value="true" />
+      <created>1779202828235</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1779202828235</updated>
+    </task>
+    <task id="LOCAL-00012" summary="完善购物车（2）">
+      <option name="closed" value="true" />
+      <created>1779203359804</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1779203359804</updated>
+    </task>
+    <task id="LOCAL-00013" summary="可运行版本">
+      <option name="closed" value="true" />
+      <created>1779204517308</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1779204517308</updated>
+    </task>
+    <task id="LOCAL-00014" summary="完善后端代码版本">
+      <option name="closed" value="true" />
+      <created>1779239613760</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1779239613760</updated>
+    </task>
+    <task id="LOCAL-00015" summary="完善后端代码版本（2）">
+      <option name="closed" value="true" />
+      <created>1779243203628</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1779243203628</updated>
+    </task>
+    <task id="LOCAL-00016" summary="完善业务代码版本">
+      <option name="closed" value="true" />
+      <created>1779244393689</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1779244393689</updated>
+    </task>
+    <task id="LOCAL-00017" summary="优化数据库部分">
+      <option name="closed" value="true" />
+      <created>1780316099748</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1780316099748</updated>
+    </task>
+    <task id="LOCAL-00018" summary="优化数据库部分">
+      <option name="closed" value="true" />
+      <created>1780319967374</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1780319967374</updated>
+    </task>
+    <task id="LOCAL-00019" summary="优化数据库部分">
+      <option name="closed" value="true" />
+      <created>1780322118192</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1780322118192</updated>
+    </task>
+    <task id="LOCAL-00020" summary="优化数据库部分">
+      <option name="closed" value="true" />
+      <created>1780322299909</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1780322299909</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="前端完善可运行版本" />
+    <MESSAGE value="首页完善版本" />
+    <MESSAGE value="完善商品详情" />
+    <MESSAGE value="完善店铺界面" />
+    <MESSAGE value="完善订单详情界面" />
+    <MESSAGE value="完善订单详情界面(2)" />
+    <MESSAGE value="完善商品图片" />
+    <MESSAGE value="完善购物车（2）" />
+    <MESSAGE value="可运行版本" />
+    <MESSAGE value="完善后端代码版本" />
+    <MESSAGE value="完善后端代码版本（2）" />
+    <MESSAGE value="完善业务代码版本" />
+    <MESSAGE value="优化数据库部分" />
+    <option name="LAST_COMMIT_MESSAGE" value="优化数据库部分" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
